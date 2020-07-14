@@ -46,14 +46,21 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import axios from 'axios';
+import { Action, State, namespace, Mutation } from 'vuex-class';
+// 相当于引入 store/modules 下的 loginStore 文件
+const loginModule = namespace('loginStore');
 interface Lode {
-        btnClickStuta: boolean;
-        loadImg: string;
+    btnClickStuta: boolean;
+    loadImg: string;
 }
 @Component({
   components: {},
 })
 export default class Login extends Vue {
+    // 通过 loginModule 来调用对应的模块的数据和方法
+    // mutation
+    @loginModule.Mutation('AUTHORIZATION_TOKEN_SET') public AUTHORIZATION_TOKEN_SET: any;
+    @loginModule.Mutation('setUserName') public setUserName: any;
     private tips: string = '';
     private username: string = '';
     private password: string = '';
@@ -62,9 +69,21 @@ export default class Login extends Vue {
         loadImg: 'd-none',
     };
     public mounted(): void {
-        console.log(this.$route);
+        const needToLogin = this.$route.query.needToLogin;
+        if (needToLogin) {
+            this.toast('b-toaster-top-center', '亲爱的 ๑Ő௰Ő๑ ，要不要登录试试呀~');
+        }
     }
-    private submit(): void {
+    public toast(toaster: string, bodyText: string = '', append: boolean = false): void {
+        this.$bvToast.toast(bodyText, {
+            title: '温馨提示',
+            variant: 'danger',
+            toaster: (toaster),
+            solid: true,
+            appendToast: append,
+        });
+    }
+    public submit(): void {
         const correvtTips: string[] = ['用户名或密码为空', '用户名或密码错误，请重试'];
         if (this.username.length <= 0 || this.password.length <= 0) {
             this.tips = correvtTips[0];
@@ -77,9 +96,14 @@ export default class Login extends Vue {
                 password: this.password,
             };
             axios.post('login/', postData).then((res) => {
-                this.$router.replace({
-                    path: '/',
-                });
+                console.log(res);
+                if (res.status === 200) {
+                    this.setUserName(postData.username);
+                    this.AUTHORIZATION_TOKEN_SET(res.data.token);
+                    this.$router.replace('/').catch((err) => {
+                        console.log(err);
+                    });
+                }
             }, (err) => {
                 console.log('请求失败！');
                 this.tips = correvtTips[1];

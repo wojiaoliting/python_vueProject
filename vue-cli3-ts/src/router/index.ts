@@ -3,7 +3,9 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import App from '../App.vue';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
+import Admin from '../views/Admin.vue';
 import { LayoutPlugin } from 'bootstrap-vue';
+
 
 Vue.use(VueRouter);
 
@@ -17,14 +19,18 @@ const routes: RouteConfig[] = [
     path: '/',
     name: 'Home',
     component: Home,
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    children: [
+      {
+        path: '/admin',
+        name: 'Admin',
+        component: Admin,
+      },
+      {
+        path: '/about',
+        name: 'About',
+        component: () => import('../views/About.vue'),
+      },
+    ],
   },
 ];
 

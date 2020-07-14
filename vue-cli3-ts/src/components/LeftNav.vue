@@ -22,7 +22,9 @@
             <b-button block variant="dark" class="d-flex justify-content-between align-items-center">
                 <div>
                     <b-icon icon="award" aria-hidden="true"></b-icon>
+                    <b-link to="/admin" class="text-white">
                     用户管理
+                    </b-link>
                 </div>
             
             </b-button>
@@ -40,13 +42,12 @@ export default class LeftNav extends Vue {
     private toggleStatu: boolean = false;
     private deg: string = '0';
     // @Prop(String) private listName!: string;
-    //   @Prop({type: String, default: ' '}) private userName!: string;
+    // @Prop({type: String, default: ' '}) private userName!: string;
     private toggleDown(): void {
         let str: string = '0';
         this.toggleStatu = !this.toggleStatu;
         str = this.toggleStatu ? '90' : '0';
         this.deg = str;
-        console.log(str);
     }
 }
 </script>
