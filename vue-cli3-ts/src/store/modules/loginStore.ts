@@ -10,20 +10,21 @@ const state: VuexState = new VuexState();
 const mutations: any = {
     setUserName(stat: VuexState, userName: string) {
         (stat as any).state.username  = userName;
-        const username: string = 'username';
-        axios.defaults.headers.common[username] = userName;
+        // axios.defaults.headers.common[username] = userName;
         window.sessionStorage.username = userName;
     },
-    AUTHORIZATION_TOKEN_SET(stat: VuexState, jwtToken: string): void {
-        const authorizationHeader: string = 'JWT ' + jwtToken;
-        const Authorization: string = 'Authorization';
-        axios.defaults.headers.common[Authorization] = authorizationHeader;
-        window.sessionStorage.AuthorizationHeader = authorizationHeader;
+    AUTHORIZATION_TOKEN_SET(stat: VuexState, jwtToken: string[]): void {
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + jwtToken[0];
+        // axios.defaults.headers.common['refresh'] = jwtToken[0];
+        window.sessionStorage.Authorization = jwtToken[0] ? 'Bearer ' + jwtToken[0] : '';
+        window.sessionStorage.refresh = jwtToken[1] ? jwtToken[1] : '';
     },
     logout(stat: VuexState): void {
-        delete window.sessionStorage.AuthorizationHeader;
-        const Authorization: string = 'Authorization';
-        delete axios.defaults.headers.common[Authorization];
+        (stat as any).state.userName = '';
+        delete axios.defaults.headers['Authorization'];
+        // delete axios.defaults.headers.common['refresh'];
+        delete window.sessionStorage.Authorization;
+        delete window.sessionStorage.refresh;
         route.replace('/login');
     },
 };

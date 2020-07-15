@@ -44,6 +44,9 @@ INSTALLED_APPS = [
 ]
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
@@ -128,8 +131,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-import datetime
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7), # 过期时间
-    'JWT_AUTH_HEADER_PREFIX': 'JWT',    # 客户端回传TOKEN时，需要增加的前缀
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),     # 设置token过期时间
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }

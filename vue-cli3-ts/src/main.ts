@@ -5,13 +5,16 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import axios from 'axios';
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import { BootstrapVue, IconsPlugin, FormInputPlugin, FormPlugin} from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/scss/custom.scss';
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+Vue.use(FormPlugin);
+Vue.use(FormInputPlugin);
+
 Vue.config.productionTip = false;
 
 // 设置axios的请求Host（作用在axios.get()或者axios.post()方法上）

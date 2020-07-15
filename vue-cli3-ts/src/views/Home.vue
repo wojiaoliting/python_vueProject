@@ -6,10 +6,10 @@
           <left-nav></left-nav>
         </b-col>
         <b-col class="bg-dark pr-3" cols="10">
-          <keep-alive>
-            <router-view>
+          <!-- <keep-alive> -->
+            <router-view v-if="isRouterAlive">
             </router-view>
-          </keep-alive>
+          <!-- </keep-alive> -->
           
         </b-col>
       </b-row>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Provide } from 'vue-property-decorator';
 import TopNav from '@/components/TopNav.vue';
 import LeftNav from '@/components/LeftNav.vue';
 import { Action, State, namespace, Mutation } from 'vuex-class';
@@ -33,7 +33,17 @@ const loginModule = namespace('loginStore');
 })
 export default class App extends Vue {
     // state
+    @Provide() public reloads: Function = this.reload;
+    public isRouterAlive: boolean = true;
     public username: string = window.sessionStorage.username;
+    public reload (): void{
+      console.log(this.isRouterAlive)
+      this.isRouterAlive = false;
+      this.$nextTick(function() {
+        this.isRouterAlive = true;
+      })
+     
+    }
 }
 </script>
 

@@ -95,11 +95,11 @@ export default class Login extends Vue {
                 username: this.username,
                 password: this.password,
             };
-            axios.post('login/', postData).then((res) => {
+            axios.post('api/token/obtain/', postData).then((res) => {
                 console.log(res);
                 if (res.status === 200) {
                     this.setUserName(postData.username);
-                    this.AUTHORIZATION_TOKEN_SET(res.data.token);
+                    this.AUTHORIZATION_TOKEN_SET([res.data.access, res.data.refresh]);
                     this.$router.replace('/').catch((err) => {
                         console.log(err);
                     });
