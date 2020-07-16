@@ -7,7 +7,7 @@
             成员查询
         </b-button>
 
-        <b-modal id="modal-multi-1" size="lg" title="查找范围" ok-only no-stacking>
+        <b-modal id="modal-multi-1" size="lg" title="查找范围" ok-only @hidden="resetModal">
           <div class="my-1">
             <b-form  class="mb-4" inline>
                 <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0">用户名</b-form-checkbox>
@@ -28,18 +28,20 @@
                 <label class="mr-sm-2 ml-sm-4" for="example-datepicker2">结束时间</label>
                 <b-form-datepicker id="example-datepicker2"  class="" size='sm'></b-form-datepicker>
             </b-form>  
-            <b-input-group class="mb-3">
-                <b-form-input></b-form-input>
-                <b-input-group-append>
-                <b-button text="Button" variant="success" v-b-modal.modal-multi-2>ヾ(✿ﾟ▽ﾟ)ノ搜一搜</b-button>
-                </b-input-group-append>
-            </b-input-group>
           </div>
+          <template v-slot:modal-footer>
+              <b-input-group class="mb-3">
+                <b-form-input v-model="search"></b-form-input>
+                <b-input-group-append>
+                <b-button text="Button" variant="success" @click="getSearch" v-b-modal.modal-multi-2>ヾ(✿ﾟ▽ﾟ)ノ搜一搜</b-button>
+                </b-input-group-append>
+              </b-input-group>
+          </template>
         </b-modal>
 
-        <b-modal id="modal-multi-2" title="Second Modal" ok-only>
-          <p class="my-2">Second Modal</p>
-          <b-button v-b-modal.modal-multi-3 size="sm">Open Third Modal</b-button>
+        <b-modal id="modal-multi-2" title="搜索结果" size="lg" ok-only>
+          <user-table :inputtext="searchContent"></user-table>
+          <b-button v-b-modal.modal-multi-3 size="">Open Third Modal</b-button>
         </b-modal>
 
         <b-modal id="modal-multi-3" size="sm" title="Third Modal" ok-only>
@@ -58,23 +60,6 @@
       @hidden="resetModal"
       @ok="handleOk"
     >
-      <!-- <form>
-  <div class="form-row">
-    <div class="col-md-4 mb-3">
-      <label for="validationServerUsername">Username</label>
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text" id="inputGroupPrepend3">@</span>
-        </div>
-        <input type="text" class="form-control is-invalid" id="validationServerUsername" aria-describedby="inputGroupPrepend3" required>
-        <div class="invalid-feedback">
-          Please choose a username.
-        </div>
-      </div>
-    </div>
-  </div>
-  <button class="btn btn-primary" type="submit">Submit form</button>
-</form> -->
       <b-form ref="form1">
         <b-form-group label-cols="3" label-cols-lg="2" :state="usernameState" label="用户名" label-size="sm" label-for="name-input" :invalid-feedback="invaUsername" valid-feedback="">
           <!-- <template slot="prepend"> -->
@@ -106,22 +91,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue ,Inject } from 'vue-property-decorator';
-import axios from 'axios'
+import { Component, Prop, Vue , Inject } from 'vue-property-decorator';
+import axios from 'axios';
+import UserTable from '@/components/UserTable.vue';
+import { Action, State, namespace, Mutation } from 'vuex-class';
 interface User {
-          username: string ,
-          password: string ,
-          email: string ,
-        };
+          username: string;
+          password: string;
+          email: string;
+        }
 @Component({
   components: {
-
-  }
+    UserTable
+  },
 })
 export default class UserSearch extends Vue {
 //   @Prop() private msg!: string;
-    @Inject('reloads') reload :any;
-    $inject: string[] = ['reload'];
+    @Inject('reloads') public reload: any;
     public selected: any = null;
     public options: any[] = [
         { value: null, text: 'Please select an option' },
@@ -130,43 +116,61 @@ export default class UserSearch extends Vue {
         { value: { C: '3PO' }, text: 'This is an option with object value' },
         { value: 'd', text: 'This one is disabled', disabled: true },
     ];
-    public username: string ='';
+    public username: string = '';
     public usernameState: any = null;
-    public email: string ='';
+    public email: string = '';
     public emailState: any = null;
-    public pass: string ='';
+    public pass: string = '';
     public passState: any = null;
-    public repass: string ='';
+    public repass: string = '';
     public repassState: any = null;
     public submittedNames: any[] = [];
     public invaUsername: string = '';
     public invaEmail: string = '';
     public invaPass: string = '';
     public invaRepass: string = '';
-    // get usernameState(){
-    //     //computed name
-    //     return this.username.length >1;
-    // }
-    // get emailState(){
-    //     //computed name
-    //     return this.email.length >1;
-    // }
-    // get passState(){
-    //     //computed name
-    //     return this.pass.length >= 8;
-    // }
-    // get repassState(){
-    //     //computed name
-    //     return this.repass.length >= 8;
-    // }
-    mounted() {
+    public search: string = '';
+    public searchContent: string = '';
+    public getSearch(): void {
+        this.searchContent = this.search;
     }
-    checkFormValidity() {
+    public popToast(msg: string, typeStatu: string): void {
+        // Use a shorter name for this.$createElement
+        const h = this.$createElement;
+        // Increment the toast count
+        // Create the message
+        const vNodesMsg = h(
+          'p',
+          { class: ['text-center', 'mb-0'] },
+          [
+            h('b-spinner', { props: { type: 'grow', small: true } }),
+            ' Flashy ',
+            h('strong', 'toast'),
+            ` message #${msg} `,
+            h('b-spinner', { props: { type: 'grow', small: true } }),
+          ],
+        );
+        // Create the title
+        const vNodesTitle = h(
+          'div',
+          { class: ['d-flex', 'flex-grow-1', 'align-items-baseline', 'mr-2'] },
+          [
+            h('strong', { class: 'mr-2' }, 'The Title'),
+            h('small', { class: 'ml-auto text-italics' }, '5 minutes ago'),
+          ],
+        );
+        // Pass the VNodes as an array for message and title
+        this.$bvToast.toast([vNodesMsg], {
+          title: [vNodesTitle],
+          solid: true,
+          variant: typeStatu,
+        });
+    }
+    public checkFormValidity(): boolean {
         const valid1 = (this as any).$refs.form1.checkValidity();
         const valid2 = (this as any).$refs.form2.checkValidity();
         const valid3 = (this as any).$refs.form3.checkValidity();
         let valid4 = (this as any).$refs.form4.checkValidity();
-        
         this.usernameState = valid1;
         if (!valid1) {
           if (this.username.length <= 0) {
@@ -196,41 +200,50 @@ export default class UserSearch extends Vue {
         this.repassState = valid4;
         return valid1 && valid2 && valid3 && valid4;
     }
-    resetModal() {
-        this.username = ''
-        this.usernameState = null
+    public resetModal(): void {
+        this.username = '';
+        this.usernameState = null;
+        this.email = '';
+        this.emailState = null;
+        this.pass = '';
+        this.passState = null;
+        this.repass = '';
+        this.repassState = null;
+        this.search = '';
+        this.searchContent = '';
     }
-    handleOk(bvModalEvt: any) {
+    public handleOk(bvModalEvt: any): void {
         // Prevent modal from closing
-        bvModalEvt.preventDefault()
+        bvModalEvt.preventDefault();
         // Trigger submit handler
-        this.handleSubmit()
+        this.handleSubmit();
     }
-    handleSubmit() {
+    public handleSubmit(): void {
         // Exit when the form isn't valid
         if (!this.checkFormValidity()) {
-            return
+            return;
         }
         // Push the name to submitted names
-        
-        let postData: User = {
+        const postData: User = {
           username : this.username,
           password : this.pass,
           email : this.email,
-        }
-        axios.post('/admins/',postData).then((res) => {
+        };
+        axios.post('/admins/', postData).then((res) => {
           // 等待dom渲染后执行的方法
-          this.$nextTick(() => {
-            this.$bvModal.hide('modal-prevent-closing');
-            this.reload();
-          })
+          if (res.status === 201) {
+            this.$nextTick(() => {
+              this.$bvModal.hide('modal-prevent-closing');
+              this.reload(() => {
+                this.popToast('用户添加成功', 'success');
+              });
+            });
+          }
         }, (erro) => {
-
-        })
-        // Hide the modal manually
-        
+          this.popToast('用户添加失败!用户名已经存在', 'info');
+          console.log(erro);
+        });
     }
-
 }
 </script>
 

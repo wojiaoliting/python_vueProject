@@ -9,7 +9,7 @@ class VuexState {
 const state: VuexState = new VuexState();
 const mutations: any = {
     setUserName(stat: VuexState, userName: string) {
-        (stat as any).state.username  = userName;
+        (stat as any).username  = userName;
         // axios.defaults.headers.common[username] = userName;
         window.sessionStorage.username = userName;
     },
@@ -20,7 +20,7 @@ const mutations: any = {
         window.sessionStorage.refresh = jwtToken[1] ? jwtToken[1] : '';
     },
     logout(stat: VuexState): void {
-        (stat as any).state.userName = '';
+        (stat as any).userName = '';
         delete axios.defaults.headers['Authorization'];
         // delete axios.defaults.headers.common['refresh'];
         delete window.sessionStorage.Authorization;
@@ -35,7 +35,7 @@ const actions: any = {
 };
 export default {
     namespaced: true, // 必须要开放
-    state: () => ({ state }),
+    state: () => ( state ),
     mutations,
     actions,
 };

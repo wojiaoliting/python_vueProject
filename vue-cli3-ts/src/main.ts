@@ -5,7 +5,7 @@ import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import axios from 'axios';
-import { BootstrapVue, IconsPlugin, FormInputPlugin, FormPlugin} from 'bootstrap-vue';
+import { BootstrapVue, IconsPlugin, FormInputPlugin, FormPlugin, PaginationPlugin} from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/scss/custom.scss';
@@ -14,6 +14,7 @@ Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 Vue.use(FormPlugin);
 Vue.use(FormInputPlugin);
+Vue.use(PaginationPlugin);
 
 Vue.config.productionTip = false;
 

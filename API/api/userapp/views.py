@@ -5,9 +5,14 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import permissions
 from rest_framework_simplejwt import authentication
 from rest_framework.views import APIView
+from rest_framework import filters
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from .customPagination import UserPagination
 from django.contrib.auth.models import User
 from userapp.models import UserProfile
 from .serializers import UserSerializer,UserProfileSerializer
@@ -18,6 +23,10 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-id')
     serializer_class = UserSerializer
+    # ordering=('-id',)
+    pagination_class = UserPagination
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
+    search_fields = ('username', 'email')
     # permission_classes = [permissions.IsAuthenticated]
     # pagination_class = 
     # def get(self, request):

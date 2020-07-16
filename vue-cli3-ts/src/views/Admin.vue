@@ -8,24 +8,22 @@
       <b-breadcrumb-item href="#foo" active>管理员列表</b-breadcrumb-item>  
     </b-breadcrumb>
     <user-search></user-search>
-    <b-table hover :items="listItems" class="bg-white dash"></b-table>
-    <div class="mt-3 d-flex justify-content-end">
-      <b-pagination v-model="currentPage" pills :total-rows="rows"></b-pagination>
-    </div>
-    <div class="mb-3 d-flex justify-content-end">
-      <b-badge pill variant="light">共{{pageNum}}页/共{{totle}}条记录</b-badge>
-    </div>
+    <user-table small="false"></user-table>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import UserSearch from '@/components/UserSearch.vue';
+import UserTable from '@/components/UserTable.vue';
 import axios from 'axios';
+import { Action, State, namespace, Mutation } from 'vuex-class';
+const userStore = namespace('userStore');
 @Component({
   components: {
     UserSearch,
-  }
+    UserTable,
+  },
 })
 export default class Admin extends Vue {
   public items: any[] = [
@@ -39,50 +37,8 @@ export default class Admin extends Vue {
       active: true,
     },
   ];
-  public listItems: any[] = [];
-  public totle: number = 0;
-  public pageNum: number = 1;
-  public currentPage: number = 1;
-  public rows: number = 1;
-  public page: number = 1;
   public title: string = '';
   public created(): void {
-    const linkParam = {
-      page: this.page,
-      title: this.title,
-    };
-    axios.get('/admins/', {
-      params: {
-      page: this.page,
-    },
-    }).then((res) => {
-      console.log(res);
-      if (res.status === 200) {
-        const data = res.data.results;
-        const item: any = [];
-        data.forEach((val: any, index: any) => {
-          const obj: any = {};
-          const id = 'id';
-          const username = '管理员名称';
-          const email = '邮箱地址';
-          const lastLogin = '最近登录';
-          const rowVariant = '_rowVariant';
-          obj[id] = val[id];
-          obj[username] = val['username'];
-          obj[email] = val['email'] ? val['email'] : '空';
-          obj[lastLogin] = val['last_login'] ? new Date (val['last_login']) : '未登录过';
-          if (!val['email'] && !val['last_login']) {
-            obj[rowVariant] = 'danger';
-          }
-          item.push(obj);
-        });
-        this.totle = res.data.count ;
-        this.listItems = item;
-
-      }
-    }, (erro) => {
-      console.log(erro);
-    });
   }
 }
 </script>

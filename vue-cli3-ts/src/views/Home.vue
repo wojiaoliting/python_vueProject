@@ -33,16 +33,15 @@ const loginModule = namespace('loginStore');
 })
 export default class App extends Vue {
     // state
-    @Provide() public reloads: Function = this.reload;
+    @Provide() public reloads: (callback: () => void) => void = this.reload;
     public isRouterAlive: boolean = true;
     public username: string = window.sessionStorage.username;
-    public reload (): void{
-      console.log(this.isRouterAlive)
+    public reload(callback: () => void): void {
       this.isRouterAlive = false;
       this.$nextTick(function() {
         this.isRouterAlive = true;
-      })
-     
+        callback();
+      });
     }
 }
 </script>
