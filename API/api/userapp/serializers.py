@@ -12,13 +12,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = UserProfile
-        fields = ("user","nickname", "gender")
+        fields = ("user","nickname","gender","mobile","birthday","id")
+        read_only_fields=['id']
+
         # fields=('__all__')
 class UserSerializer(serializers.ModelSerializer):
-    # profile_of=UserProfileSerializer()
+    profile_of=UserProfileSerializer()
     class Meta:
         model = User
-        fields = ('id','username','password','email','last_login')
+        fields = ('id','username','password','email','last_login','profile_of')
         read_only_fields=['last_login']
         extra_kwargs={'password':{'write_only':True}}
     def create(self, validated_data):

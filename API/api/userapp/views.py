@@ -38,4 +38,4 @@ class UserProfileViewset(viewsets.ModelViewSet):
     """
     queryset = UserProfile.objects.all()       # 这里只是定义了SQL语句的写法，并不会真的进行查询，只有当遍历对应数据时才会进行真正的查询
     serializer_class = UserProfileSerializer    # 序列化类
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]

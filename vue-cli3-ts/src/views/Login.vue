@@ -24,7 +24,7 @@
                                 </svg>
                                 密码
                             </label>
-                            <input type="password" v-model="password" class="form-control" id="exampleInputPassword" name="password">
+                            <input type="password" v-model="password" @keydown.enter="submit" class="form-control" id="exampleInputPassword" name="password">
                         </div>
                         <div class="form-group form-check">
                             <input type="checkbox" class="form-check-input" id="exampleCheck1">

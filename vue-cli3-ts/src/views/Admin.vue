@@ -8,7 +8,7 @@
       <b-breadcrumb-item href="#foo" active>管理员列表</b-breadcrumb-item>  
     </b-breadcrumb>
     <user-search></user-search>
-    <user-table small="false"></user-table>
+    <user-table small="false" idName="1"></user-table>
   </div>
 </template>
 

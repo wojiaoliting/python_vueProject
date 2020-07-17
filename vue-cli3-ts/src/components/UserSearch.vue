@@ -6,7 +6,6 @@
             <b-icon icon="search" aria-hidden="true" ></b-icon>
             成员查询
         </b-button>
-
         <b-modal id="modal-multi-1" size="lg" title="查找范围" ok-only @hidden="resetModal">
           <div class="my-1">
             <b-form  class="mb-4" inline>
@@ -31,23 +30,18 @@
           </div>
           <template v-slot:modal-footer>
               <b-input-group class="mb-3">
-                <b-form-input v-model="search"></b-form-input>
+                <b-form-input v-model="search" @keydown.enter="getSearch"></b-form-input>
                 <b-input-group-append>
-                <b-button text="Button" variant="success" @click="getSearch" v-b-modal.modal-multi-2>ヾ(✿ﾟ▽ﾟ)ノ搜一搜</b-button>
+                <b-button text="Button"  @click="getSearch" variant="success">ヾ(✿ﾟ▽ﾟ)ノ搜一搜</b-button>
                 </b-input-group-append>
               </b-input-group>
           </template>
         </b-modal>
-
         <b-modal id="modal-multi-2" title="搜索结果" size="lg" ok-only>
-          <user-table :inputtext="searchContent"></user-table>
-          <b-button v-b-modal.modal-multi-3 size="">Open Third Modal</b-button>
-        </b-modal>
-
-        <b-modal id="modal-multi-3" size="sm" title="Third Modal" ok-only>
-          <p class="my-1">Third Modal</p>
+          <user-table :inputtext="searchContent" idName="2"></user-table>
         </b-modal>
       </div>
+
       <b-button pill variant="outline-light" v-b-modal.modal-prevent-closing>
           <b-icon icon="person-plus" aria-hidden="true" ></b-icon>
           成员添加
@@ -102,7 +96,7 @@ interface User {
         }
 @Component({
   components: {
-    UserTable
+    UserTable,
   },
 })
 export default class UserSearch extends Vue {
@@ -132,6 +126,7 @@ export default class UserSearch extends Vue {
     public search: string = '';
     public searchContent: string = '';
     public getSearch(): void {
+        this.$bvModal.show('modal-multi-2');
         this.searchContent = this.search;
     }
     public popToast(msg: string, typeStatu: string): void {
@@ -146,7 +141,7 @@ export default class UserSearch extends Vue {
             h('b-spinner', { props: { type: 'grow', small: true } }),
             ' Flashy ',
             h('strong', 'toast'),
-            ` message #${msg} `,
+            ` ${msg} `,
             h('b-spinner', { props: { type: 'grow', small: true } }),
           ],
         );
