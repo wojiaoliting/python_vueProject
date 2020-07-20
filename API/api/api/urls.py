@@ -14,8 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from api.settings import MEDIA_ROOT
+from django.urls import path, re_path
 from django.conf.urls import url, include
+from django.views.static import serve
 from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
 from rest_framework.routers import DefaultRouter
@@ -35,3 +37,7 @@ urlpatterns = [
     url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),	# 需要添加的内容
 
 ]
+
+urlpatterns.extend([
+    url(r'^media/(?P<path>.*)$', serve, {"document_root": MEDIA_ROOT}),     # path 将作为第二参数传到server进行处理
+])

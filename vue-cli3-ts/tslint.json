@@ -16,6 +16,7 @@
     "object-literal-sort-keys": false,
     "ordered-imports": false,
     "quotemark": [true, "single"],
-    "no-string-literal": false
+    "no-string-literal": false,
+    "no-empty": false
   }
 }

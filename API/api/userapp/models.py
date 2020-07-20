@@ -11,7 +11,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile_of',)
     nickname = models.CharField(max_length=30, null=True, blank=True, verbose_name="昵称")
     birthday = models.DateField(null=True, blank=True, verbose_name="出生年月")
-    icon = models.ImageField(blank=True, null=True, max_length=200, upload_to='userapp/uploads/%Y/%m/%d/')
+    icon = models.ImageField(blank=True, null=True, max_length=200, upload_to='media/uploads/%Y/%m/%d/')
     gender = models.CharField(max_length=6, choices=(("male", "男"), ("female", "女")), default="female", verbose_name="性别")
     mobile = models.CharField(null=True, blank=True, max_length=13, verbose_name="电话")
     created = models.DateTimeField('发布时间',auto_now_add=True)

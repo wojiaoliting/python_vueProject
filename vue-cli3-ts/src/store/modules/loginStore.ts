@@ -23,8 +23,9 @@ const mutations: any = {
         (stat as any).userName = '';
         delete axios.defaults.headers['Authorization'];
         // delete axios.defaults.headers.common['refresh'];
-        delete window.sessionStorage.Authorization;
-        delete window.sessionStorage.refresh;
+        // delete window.sessionStorage.Authorization;
+        // delete window.sessionStorage.refresh;
+        window.sessionStorage.clear();
         route.replace('/login');
     },
 };

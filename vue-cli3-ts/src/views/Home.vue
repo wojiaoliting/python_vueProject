@@ -1,5 +1,6 @@
 <template>
     <b-container fluid>
+      <audio src="@/assets/audio/know.mp3" autoplay></audio>
       <top-nav msg="❤ »» 后台管理系统" :userName="username" class="m-3"></top-nav>
       <b-row>
         <b-col class=" pl-3" cols="2">

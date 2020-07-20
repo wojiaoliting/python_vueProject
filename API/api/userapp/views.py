@@ -15,7 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .customPagination import UserPagination
 from django.contrib.auth.models import User
 from userapp.models import UserProfile
-from .serializers import UserSerializer,UserProfileSerializer
+from .serializers import UserSerializer,UserProfileSerializer,UserOnlySerializer
 # Create your views here.
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -31,6 +31,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # pagination_class = 
     # def get(self, request):
     #     return Response('ok')
+
 
 class UserProfileViewset(viewsets.ModelViewSet):
     """

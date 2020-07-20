@@ -1,21 +1,17 @@
 <template>
   <div>
-    <b-table striped dark small head-variant="light" table-variant="dark" hover :items="items" class="text-light dash">
+    <b-table striped dark small head-variant="light" :fields="fields" table-variant="dark" hover :items="items" key="" class="text-light dash">
       <template v-slot:cell(操作)="data">
           <div>
             <b-button-group size="sm">
               <b-button variant="outline-success" @click="showUserProfile(data.value)">
                 <b-icon icon="person-lines-fill"></b-icon> 详细信息
               </b-button>
-              <b-button variant="outline-info" @click="editUserProfile(data.value)">
-                <b-icon icon="file-earmark-text"></b-icon> 信息编辑
-              </b-button>
-              <b-button variant="outline-light" @click="delUserProfile(data.value)">
+              <b-button variant="outline-light" @click="getDelUserId(data.value)">
                 <b-icon icon="trash2"></b-icon> 删除
               </b-button>
             </b-button-group>
           </div>
-
       </template>
     </b-table>
     <div class="mt-3 d-flex justify-content-end">
@@ -24,10 +20,14 @@
     <div class="mb-3 d-flex justify-content-end">
       <b-badge pill variant="light">共{{pageNum}}页/共{{totle}}条记录</b-badge>
     </div>
-    <b-modal :id="showModelId" size="lg" title="档案袋" ok-only @hidden="resetModal">
+    <b-modal :id="showModelId" size="lg" title="档案袋" @hidden="resetModal">
         <b-media right-align vertical-align="top">
           <template v-slot:aside>
-            <b-img blank blank-color="#ccc" width="80" alt="placeholder"></b-img>
+            <div class="profileImgbottom text-center border border-success rounded-circle" :style="'background-image:url('+infoParam.icon+')'" blank title="点击修改头像" @click="$bvModal.show(editModelId)" width="80" height="80" alt="修改头像">
+              <div class="profileImg  border border-success rounded-circle" title="点击修改头像" @click="$bvModal.show('editPicture')" width="80" height="80" alt="修改头像">
+                  修改头像
+              </div>
+            </div>
           </template>
           <h5 class="mt-0 mb-1">{{userinfo.username}}</h5>
           <p class="mb-0">
@@ -109,13 +109,18 @@
           </p>
         </b-media>
         <template v-slot:modal-footer>
+              <b-button text="Button"  @click="$bvModal.hide(showModelId)" variant="dark">退出</b-button>
               <b-button text="Button"  @click="toEdit" variant="success">{{editBtnText}}</b-button>
         </template>
     </b-modal>
-    <b-modal id="editIsOk" size="sm" title="提示" ok-only>
-          <p class="my-1">编辑</p>
+    <b-modal :id="editModelId" size="lg" title="修改头像">
+          <picture-cropper v-on:get-img-blob="crooperImg"></picture-cropper>
+          <template v-slot:modal-footer>
+              <b-button text="Button"  @click="$bvModal.hide(editModelId)" variant="dark">退出</b-button>
+              <b-button text="Button"  @click="uploadImg" variant="success" :disabled="isUploadImg">上传</b-button>
+          </template>
     </b-modal>
-    <b-modal :id="delModelId" okVariant="danger" cancelTitle="取消" okTitle="确定" size="sm" title="警告" >
+    <b-modal :id="delModelId" okVariant="danger" cancelTitle="取消" okTitle="确定" size="sm" title="警告" @ok="delUserProfile">
           <p class="my-1">您确定要删除这位管理员吗(╯°Д°)╯？</p>
     </b-modal>
   </div>
@@ -125,6 +130,7 @@
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import axios from 'axios';
 import dayjs from 'dayjs';
+import PictureCropper from '@/components/PictureCropper.vue';
 import { Action, State, namespace, Mutation } from 'vuex-class';
 const userStore = namespace('userStore');
 interface ProfileOf {
@@ -132,6 +138,7 @@ interface ProfileOf {
   gender: string;
   birthday: string;
   mobile: string;
+  icon: string;
   created: string;
   updated: string;
 }
@@ -140,7 +147,11 @@ interface UserInfo {
   email: string;
   profile_of: ProfileOf;
 }
-@Component
+@Component({
+  components: {
+    PictureCropper,
+  },
+})
 export default class UserTable extends Vue {
   @userStore.State('pageSize') private perPage: any;
   @Prop(String) private inputtext !: string ;
@@ -148,10 +159,11 @@ export default class UserTable extends Vue {
   // @Prop(String) private EditModelId !: string ;
   // @Prop(String) private delUserModelId !: string ;
   // @Prop() public small: boolean = false;
+  private fields: string[] = ['id', '名称', '邮箱地址', '最近登录', '操作'];
   private showModelId = `modal-multi-show${this.idName}`;
   private editModelId = `modal-multi-edit${this.idName}`;
   private delModelId = `modal-multi-del${this.idName}`;
-  private items: any[] = [];
+  private items: object[] = [];
   private nicknameState: any = null;
   private mobileState: any = null;
   private userinfo: UserInfo = {
@@ -162,6 +174,7 @@ export default class UserTable extends Vue {
       gender: '',
       birthday: '',
       mobile: '',
+      icon: '/logo.png',
       created: '',
       updated: '',
     },
@@ -171,15 +184,19 @@ export default class UserTable extends Vue {
     birthday : '',
     gender : '',
     mobile : '',
+    icon : '/logo.png',
     user : '',
   };
   private editBtn: boolean = true;
   private editBtnText: string = '编辑(๑*◡*๑)';
+  private imgBlob: any = '';
+  private isUploadImg: boolean = false;
   private hasInfo: boolean = false;
   private totle: number = 0;
   private pageNum: number = 1;
   private currentPage: number = 1;
   private page: number = 1;
+  private delId: number | null = null;
   get rows(): number {
     return this.totle;
   }
@@ -195,7 +212,7 @@ export default class UserTable extends Vue {
       if (res.status === 200) {
         const data = res.data.results;
         const item: any = [];
-        data.forEach((val: any, index: any) => {
+        data.forEach((val: any, index: number) => {
             const obj: any = {};
             obj['id'] = val['id'];
             obj['名称'] = val['username'];
@@ -214,9 +231,9 @@ export default class UserTable extends Vue {
       }
     }, (erro) => {});
   }
-  private showUserProfile(id: number): void {
+  private showUserProfile(value: any): void {
     this.$bvModal.show(this.showModelId);
-    axios.get(`/admins/${id}/`).then((res) => {
+    axios.get(`/admins/${value}/`).then((res) => {
       if (res.status === 200) {
         this.hasInfo = res.data.profile_of ? true : false;
         const info: any = res.data;
@@ -228,6 +245,7 @@ export default class UserTable extends Vue {
         info.profile_of.gender = info.profile_of.gender ? (info.profile_of.gender === 'male' ? '男' : '女') : '';
         this.infoParam.birthday = info.profile_of.birthday ? info.profile_of.birthday : '';
         this.infoParam.mobile = info.profile_of.mobile ? info.profile_of.mobile : '';
+        this.infoParam.icon = info.profile_of.icon ? info.profile_of.icon : '/logo.png';
         info.profile_of.created = dayjs(info.profile_of.created).format('YYYY/M/D h:mm A');
         info.profile_of.updated = dayjs(info.profile_of.updated).format('YYYY/M/D h:mm A');
         this.userinfo = info;
@@ -236,14 +254,19 @@ export default class UserTable extends Vue {
     }, (erro) => {});
   }
   private toEdit(): void {
-    const list: any= {};
+    const list: any = {};
     for (const key in this.infoParam) {
-      if (key === "gender" || key === "birthday") {
-        if (this.infoParam[key] !== '') {
+      if (Object.prototype.hasOwnProperty.call(this.infoParam, key)) {
+        if ( key === 'icon') {
+          continue;
+        }
+        if (key === 'gender' || key === 'birthday') {
+          if (this.infoParam[key] !== '') {
+            list[key] = this.infoParam[key];
+          }
+        } else {
           list[key] = this.infoParam[key];
         }
-      } else {
-        list[key] = this.infoParam[key];
       }
     }
     if (this.editBtn) {
@@ -263,18 +286,34 @@ export default class UserTable extends Vue {
           if (valid2) {
             this.mobileState = true;
             if (this.hasInfo) {
-              this.editPutUserProfile(list);
+              this.editPutUserProfile(list, '用户档案', (e: boolean) => {
+                    if (e) {
+                      this.resetEdit();
+                    }
+              });
             } else {
-              this.editPostUserProfile(list);
+              this.editPostUserProfile(list, '用户档案', (e: boolean) => {
+                    if (e) {
+                      this.resetEdit();
+                    }
+              });
             }
           } else {
             this.mobileState = false;
           }
         } else {
             if (this.hasInfo) {
-              this.editPutUserProfile(list);
+              this.editPutUserProfile(list, '用户档案', (e: boolean) => {
+                    if (e) {
+                      this.resetEdit();
+                    }
+              });
             } else {
-              this.editPostUserProfile(list);
+              this.editPostUserProfile(list, '用户档案', (e: boolean) => {
+                    if (e) {
+                      this.resetEdit();
+                    }
+              });
             }
         }
       } else {
@@ -289,70 +328,174 @@ export default class UserTable extends Vue {
       }
     }
   }
-  private resetEdit(): void{
-    this.nicknameState = null;
-    this.mobileState = null;
-    this.editBtn = true;
-    this.editBtnText ='编辑(๑*◡*๑)';
-  }
   private resetModal(): void {
     this.hasInfo = false;
     const list = this.infoParam;
     for (const key in list) {
-      list[key] = '';
+      if (Object.prototype.hasOwnProperty.call(list, key)) {
+        if (key === 'icon') {
+          list[key] = '/logo.png';
+          continue;
+        }
+        list[key] = '';
+      }
     }
     this.infoParam = list;
     this.resetEdit();
   }
-  private editPostUserProfile(list: any): void {
+  private crooperImg(e: any): void {
+    this.imgBlob = e;
+  }
+  private uploadImg(): void {
+    if (!this.imgBlob.file) {
+      return;
+    }
+    this.isUploadImg = true;
+    const list: FormData = new FormData();
+    if (this.infoParam.user) {
+      list.append('user', this.infoParam.user);
+    }
+    list.append('icon', this.imgBlob.file);
+    if (this.hasInfo) {
+      this.editPutUserProfile(list, '用户头像', (e: boolean) => {
+        this.isUploadImg = false;
+        this.infoParam.icon = this.imgBlob.basedata;
+        this.$bvModal.hide(this.editModelId);
+      });
+    } else {
+      // console.log('还没有用户', this.infoParam);
+      this.editPostUserProfile(list, '用户头像', (e: boolean) => {
+        this.isUploadImg = false;
+        this.infoParam.icon = this.imgBlob.basedata;
+        this.$bvModal.hide(this.editModelId);
+      });
+    }
+  }
+  private resetEdit(): void {
+    // 编辑用户信息属性
+    this.nicknameState = null;
+    this.mobileState = null;
+    this.editBtn = true;
+    this.editBtnText = '编辑(๑*◡*๑)';
+    // 上传用户头像图片属性
+    this.isUploadImg = false;
+    this.imgBlob = '';
+  }
+  private editPostUserProfile(list: any, text: string, callback?: (isOk: boolean) => void): void {
+    let isSuccess: boolean = false;
     axios.post(`/profile/`, list).then((res) => {
-      console.log(res);
+      isSuccess = true;
       this.infoParam.id = res.data.id;
-      this.$bvToast.toast(`用户档案修改成功喽ヾ(๑╹◡╹)ﾉ"`, {
+      this.$bvToast.toast(`${text}修改成功喽ヾ(๑╹◡╹)ﾉ"`, {
             title: `提示`,
             toaster: 'b-toaster-top-center',
             solid: true,
             appendToast: false,
             variant: 'success',
-        });
-        this.resetEdit();
-        this.hasInfo = true;
+      });
+      this.hasInfo = true;
       }, (erro) => {
-        this.$bvToast.toast(`用户档案修改失败，请稍后再试吧~"`, {
+        this.$bvToast.toast(`${text}修改失败，请稍后再试吧~"`, {
             title: `提示`,
             toaster: 'b-toaster-top-center',
             solid: true,
             appendToast: false,
             variant: 'dark',
         });
+      }).then(() => {
+          if (callback) {
+            callback(isSuccess);
+          }
       });
   }
-  private editPutUserProfile(list: any): void {
+  private editPutUserProfile(list: any, text: string, callback?: (isOk: boolean) => void): void {
+    let isSuccess: boolean = false;
     axios.put(`/profile/${this.infoParam.id}/`, list).then((res) => {
-        this.$bvToast.toast(`用户档案修改成功喽ヾ(๑╹◡╹)ﾉ"`, {
-              title: `提示`,
-              toaster: 'b-toaster-top-center',
-              solid: true,
-              appendToast: true,
-              variant: 'success',
-            });
-            this.resetEdit();
+      isSuccess = true;
+      this.$bvToast.toast(`${text}修改成功喽ヾ(๑╹◡╹)ﾉ"`, {
+            title: `提示`,
+            toaster: 'b-toaster-top-center',
+            solid: true,
+            appendToast: true,
+            variant: 'success',
+      });
     }, (erro) => {
-          this.$bvToast.toast(`用户档案修改失败，请稍后再试吧~"`, {
+        this.$bvToast.toast(`${text}修改失败，请稍后再试吧~"`, {
               title: `提示`,
               toaster: 'b-toaster-top-center',
               solid: true,
               appendToast: false,
               variant: 'dark',
         });
+    }).then(() => {
+        if (callback) {
+          callback(isSuccess);
+        }
     });
   }
-  private delUserProfile(id: number): void {
+  private getDelUserId(id: number): void {
     this.$bvModal.show(this.delModelId);
+    this.delId = id;
+  }
+  private delUserProfile(): void {
+    axios.delete(`/admins/${this.delId}/`).then((res) => {
+      this.$bvToast.toast(`管理员删除成功喽ヾ(๑╹◡╹)ﾉ"`, {
+            title: `提示`,
+            toaster: 'b-toaster-top-center',
+            solid: true,
+            appendToast: true,
+            variant: 'success',
+      });
+      if (this.delId) {
+        let count = 0;
+        const news: any[] = [];
+        for (let index = 0 ; index < this.items.length; index++) {
+          if ((this as any).items[index].id === this.delId) {
+            continue;
+          }
+          news[ count++ ] = this.items[index];
+        }
+        this.items = news;
+      }
+    }, (erro) => {
+      this.$bvToast.toast(`管理员删除失败，请稍后再试吧~"`, {
+              title: `提示`,
+              toaster: 'b-toaster-top-center',
+              solid: true,
+              appendToast: false,
+              variant: 'dark',
+      });
+    }).then(() => {
+        this.$bvModal.hide(this.delModelId);
+        this.delId = 0;
+    });
   }
 }
 </script>
 
 <style scoped lang="scss">
-
+  .profileImgbottom{
+    background-size:contain ;
+    width: 80px;
+    height: 80px;
+  }
+  .profileImg{
+    width: inherit;
+    height: inherit ;
+    line-height: 80px;
+    cursor:pointer;
+    background-color:rgba(0,0,0,0) ;
+    color:#fff;
+    background-position: 0 0;
+    background-size:contain ;
+    background-repeat:no-repeat ;
+    transition: all .5s ease-in;
+    opacity: 0;
+    &:hover{
+        background-color:rgba(0,0,0,0.6) ; 
+        transition: all .5s ease-out; 
+        background-position: 80px 80px;
+        opacity: 1;
+    }
+  }
 </style>
