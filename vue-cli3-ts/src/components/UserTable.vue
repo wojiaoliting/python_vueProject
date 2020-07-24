@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-table striped dark small head-variant="light" :fields="fields" table-variant="dark" hover :items="items" key="" class="text-light dash">
+    <b-table striped dark small head-variant="white" :fields="fields" table-variant="dark" hover :items="items" key="" class="text-light dash">
       <template v-slot:cell(操作)="data">
           <div>
             <b-button-group size="sm">
@@ -159,7 +159,7 @@ export default class UserTable extends Vue {
   // @Prop(String) private EditModelId !: string ;
   // @Prop(String) private delUserModelId !: string ;
   // @Prop() public small: boolean = false;
-  private fields: string[] = ['id', '名称', '邮箱地址', '最近登录', '操作'];
+  private fields: any[] = [{key: 'id'}, {key: '名称'}, {key: '邮箱地址'}, { key: '最近登录', sortable: true }, {key: '操作'}];
   private showModelId = `modal-multi-show${this.idName}`;
   private editModelId = `modal-multi-edit${this.idName}`;
   private delModelId = `modal-multi-del${this.idName}`;

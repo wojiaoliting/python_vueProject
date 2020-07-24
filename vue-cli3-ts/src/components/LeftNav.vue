@@ -1,6 +1,6 @@
 <template>
   <div role="tablist">
-      <b-card no-body class="mb-1">
+    <b-card no-body class="mb-1">
         <b-card-header header-tag="header" @click="toggleDown" class="p-1 d-flex justify-content-between align-items-center" role="tab">
             <b-button block variant="dark"  right v-b-toggle.index-a.index-b class="d-flex justify-content-between align-items-center">
                 <div>
@@ -27,6 +27,18 @@
                     </b-link>
                 </div>
             
+            </b-button>
+        </b-card-header>
+    </b-card>
+    <b-card no-body class="mb-1">
+        <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-button block variant="dark" class="d-flex justify-content-between align-items-center">
+                <div>
+                    <b-icon icon="book-half" aria-hidden="true"></b-icon>
+                    <b-link to="/article" class="text-white">
+                    文章管理
+                    </b-link>
+                </div>
             </b-button>
         </b-card-header>
     </b-card>

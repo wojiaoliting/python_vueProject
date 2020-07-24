@@ -4,6 +4,7 @@ import App from '../App.vue';
 import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Admin from '../views/Admin.vue';
+import Article from '../views/Article.vue';
 import { LayoutPlugin } from 'bootstrap-vue';
 
 
@@ -24,6 +25,11 @@ const routes: RouteConfig[] = [
         path: '/admin',
         name: 'Admin',
         component: Admin,
+      },
+      {
+        path: '/article',
+        name: 'Article',
+        component: Article,
       },
       {
         path: '/about',
