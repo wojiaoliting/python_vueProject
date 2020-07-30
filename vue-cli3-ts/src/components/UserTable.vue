@@ -15,7 +15,7 @@
       </template>
     </b-table>
     <div class="mt-3 d-flex justify-content-end">
-      <b-pagination @change="showUserList" v-model="currentPage" pills :total-rows="rows" :per-page="perPage"></b-pagination>
+      <b-pagination @change="showArticleList" v-model="currentPage" pills :total-rows="rows" :per-page="perPage"></b-pagination>
     </div>
     <div class="mb-3 d-flex justify-content-end">
       <b-badge pill variant="light">共{{pageNum}}页/共{{totle}}条记录</b-badge>
@@ -201,9 +201,9 @@ export default class UserTable extends Vue {
     return this.totle;
   }
   private created(): void {
-    this.showUserList(1);
+    this.showArticleList(1);
   }
-  private showUserList(pageN: number = 1): void {
+  private showArticleList(pageN: number = 1): void {
     const params: any = {
         page: pageN,
         search: this.inputtext,
@@ -286,13 +286,13 @@ export default class UserTable extends Vue {
           if (valid2) {
             this.mobileState = true;
             if (this.hasInfo) {
-              this.editPutUserProfile(list, '用户档案', (e: boolean) => {
+              this.editPutArticleProfile(list, '用户档案', (e: boolean) => {
                     if (e) {
                       this.resetEdit();
                     }
               });
             } else {
-              this.editPostUserProfile(list, '用户档案', (e: boolean) => {
+              this.editPostArticleProfile(list, '用户档案', (e: boolean) => {
                     if (e) {
                       this.resetEdit();
                     }
@@ -303,13 +303,13 @@ export default class UserTable extends Vue {
           }
         } else {
             if (this.hasInfo) {
-              this.editPutUserProfile(list, '用户档案', (e: boolean) => {
+              this.editPutArticleProfile(list, '用户档案', (e: boolean) => {
                     if (e) {
                       this.resetEdit();
                     }
               });
             } else {
-              this.editPostUserProfile(list, '用户档案', (e: boolean) => {
+              this.editPostArticleProfile(list, '用户档案', (e: boolean) => {
                     if (e) {
                       this.resetEdit();
                     }
@@ -357,14 +357,14 @@ export default class UserTable extends Vue {
     }
     list.append('icon', this.imgBlob.file);
     if (this.hasInfo) {
-      this.editPutUserProfile(list, '用户头像', (e: boolean) => {
+      this.editPutArticleProfile(list, '用户头像', (e: boolean) => {
         this.isUploadImg = false;
         this.infoParam.icon = this.imgBlob.basedata;
         this.$bvModal.hide(this.editModelId);
       });
     } else {
       // console.log('还没有用户', this.infoParam);
-      this.editPostUserProfile(list, '用户头像', (e: boolean) => {
+      this.editPostArticleProfile(list, '用户头像', (e: boolean) => {
         this.isUploadImg = false;
         this.infoParam.icon = this.imgBlob.basedata;
         this.$bvModal.hide(this.editModelId);
@@ -381,7 +381,7 @@ export default class UserTable extends Vue {
     this.isUploadImg = false;
     this.imgBlob = '';
   }
-  private editPostUserProfile(list: any, text: string, callback?: (isOk: boolean) => void): void {
+  private editPostArticleProfile(list: any, text: string, callback?: (isOk: boolean) => void): void {
     let isSuccess: boolean = false;
     axios.post(`/profile/`, list).then((res) => {
       isSuccess = true;
@@ -408,7 +408,7 @@ export default class UserTable extends Vue {
           }
       });
   }
-  private editPutUserProfile(list: any, text: string, callback?: (isOk: boolean) => void): void {
+  private editPutArticleProfile(list: any, text: string, callback?: (isOk: boolean) => void): void {
     let isSuccess: boolean = false;
     axios.put(`/profile/${this.infoParam.id}/`, list).then((res) => {
       isSuccess = true;

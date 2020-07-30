@@ -18,6 +18,7 @@ const mutations: any = {
         // axios.defaults.headers.common['refresh'] = jwtToken[0];
         window.sessionStorage.Authorization = jwtToken[0] ? 'Bearer ' + jwtToken[0] : '';
         window.sessionStorage.refresh = jwtToken[1] ? jwtToken[1] : '';
+        window.sessionStorage.Id = jwtToken[2] ? jwtToken[2] : null;
     },
     logout(stat: VuexState): void {
         (stat as any).userName = '';

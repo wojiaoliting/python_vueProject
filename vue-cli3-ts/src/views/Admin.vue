@@ -10,6 +10,7 @@
     <user-search></user-search>
     <user-table small="false" idName="1"></user-table>
   </div>
+  
 </template>
 
 <script lang="ts">

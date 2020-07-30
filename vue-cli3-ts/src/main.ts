@@ -1,17 +1,18 @@
 import Vue from 'vue';
 import fClick from 'fastclick';
 import App from './App.vue';
-import Constants from './constants';
+import constants from './constants';
 import './registerServiceWorker';
 import router from './router';
 import store from './store';
 import axios from 'axios';
-import { BootstrapVue, IconsPlugin, FormInputPlugin, FormPlugin, PaginationPlugin, ToastPlugin} from 'bootstrap-vue';
+import { BootstrapVue, IconsPlugin, FormInputPlugin, FormPlugin, PaginationPlugin, ToastPlugin, ModalPlugin} from 'bootstrap-vue';
 // 图片裁剪插件   二维码生成插件 vue-qriously
 import VueCropper from 'vue-cropper';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import './assets/scss/custom.scss';
+
 
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
@@ -19,12 +20,13 @@ Vue.use(FormPlugin);
 Vue.use(FormInputPlugin);
 Vue.use(PaginationPlugin);
 Vue.use(ToastPlugin);
+Vue.use(ModalPlugin);
 Vue.use(VueCropper);
 
 Vue.config.productionTip = false;
 
 // 设置axios的请求Host（作用在axios.get()或者axios.post()方法上）
-axios.defaults.baseURL = Constants.REQUEST_HOST;
+axios.defaults.baseURL = constants.REQUEST_HOST;
 // FastClick 是一个简单，易于使用的JS库用于消除在移动浏览器上触发click事件与一个物理Tap(敲击)之间的300延迟
 (fClick as any).attach(document.body);
 

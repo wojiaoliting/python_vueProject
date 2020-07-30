@@ -37,7 +37,7 @@
               </b-input-group>
           </template>
         </b-modal>
-        <b-modal id="modal-multi-2" title="搜索结果" size="lg" ok-only>
+        <b-modal id="modal-multi-2" scrollable title="搜索结果" size="lg" ok-only>
           <user-table :inputtext="searchContent" idName="2"></user-table>
         </b-modal>
       </div>

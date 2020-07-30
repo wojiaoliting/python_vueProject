@@ -5,18 +5,28 @@ html{
     body{
         background-color: transparent;
     }
+    img{
+        max-width: 100%;
+        max-height: 100%;
+    }
     .lx-main-color{
         // background-color: #ca3a3a9d;
         
     }
     .dropdown-menu{
         // background-color: #ca3a3a9d;
-   }
+    }
    .page-item.active .page-link{
-    font-family: Georgia, 'Times New Roman', Times, serif;
-    color: #343a40;
-    background-color: #ef95b1;
-    border-color: #ef95b1;
-    font-weight: 600;
-   }
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        color: #343a40;
+        background-color: #ef95b1;
+        border-color: #ef95b1;
+        font-weight: 600;
+    }
+    input[type="file"]{
+        height: inherit;
+    }
+    pre{
+        overflow-x: scroll;
+    }
 }

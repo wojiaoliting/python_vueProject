@@ -7,22 +7,22 @@
       </b-breadcrumb-item>
       <b-breadcrumb-item href="#foo" active>文章列表</b-breadcrumb-item>  
     </b-breadcrumb>
-    <!-- <user-search></user-search>
-    <user-table small="false" idName="1"></user-table> -->
+    <article-search></article-search>
+    <article-table small="false" idName="1"></article-table>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import UserSearch from '@/components/UserSearch.vue';
-import UserTable from '@/components/UserTable.vue';
+import ArticleSearch from '@/components/ArticleSearch.vue';
+import ArticleTable from '@/components/ArticleTable.vue';
 import axios from 'axios';
 import { Action, State, namespace, Mutation } from 'vuex-class';
 const userStore = namespace('userStore');
 @Component({
   components: {
-    UserSearch,
-    UserTable,
+    ArticleSearch,
+    ArticleTable,
   },
 })
 export default class Article extends Vue {

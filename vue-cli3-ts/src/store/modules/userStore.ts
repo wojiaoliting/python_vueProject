@@ -4,6 +4,7 @@ import route from '@/router';
 // 定义的 state 数据
 class VuexState {
     public pageSize: number = 10;
+    public imgUrl: string = 'http://localhost:8001';
 }
 
 const state: VuexState = new VuexState();

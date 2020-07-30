@@ -99,7 +99,7 @@ export default class Login extends Vue {
                 console.log(res);
                 if (res.status === 200) {
                     this.setUserName(postData.username);
-                    this.AUTHORIZATION_TOKEN_SET([res.data.access, res.data.refresh]);
+                    this.AUTHORIZATION_TOKEN_SET([res.data.access, res.data.refresh, res.data.userId]);
                     this.$router.replace('/').catch((err) => {
                         console.log(err);
                     });
@@ -125,7 +125,6 @@ export default class Login extends Vue {
   }
   .opacity-bg{
       background-color:rgba(0,0,0,.5 );
-      
   } 
 }
 </style>
